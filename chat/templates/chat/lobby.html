@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lobby</title>
+</head>
+<body>
+</body>
+    <h1>Let's Chat</h1>
+
+    <form id='form'>
+        <input type='text' name='message' />
+    </form>
+    <div id='messages'></div>
+
+
+    <script type='text/javascript'>
+        let url= `ws://${window.location.host}/ws/socket-server/`
+
+        const chatSocket = new WebSocket(url)
+
+        //쳇소켓이 멧시지를 받을때마다 함수를 실행한다 발생시킨다
+        //그 함수의 내용은 받은 제이슨 형식 데이터를 data안에 넣는 것
+        chatSocket.onmessage = function(e){
+            let data =JSON.parse(e.data)
+            console.log('Data:', data)
+
+            if (data.type === 'chat'){
+                let messages = document.getElementById('messages')
+                messages.insertAdjacentHTML('beforeend', `<div><p>${data.message}</p></div>`)
+            }
+        }
+        //동작시 움직이는 함수를 만듬
+        //submit 버튼을 누를 때마다 form의 메시지가 message에 저장되고
+        //chatsocket에 send 함수가 실행된
+        let form = document.getElementById('form')
+        form.addEventListener('submit', (e)=>{
+            e.preventDefault()
+            let message = e.target.message.value
+            chatSocket.send(JSON.stringify({
+                'message':message
+            }))
+            form. reset()
+        })
+    </script>
+
+
+
+</html>
